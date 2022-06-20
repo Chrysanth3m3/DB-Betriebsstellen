@@ -4,6 +4,8 @@ const port = 3000;
 const fs = require('fs');
 const readline = require('readline');
 
+//TODO: error handling
+
 // read csv file
 const stream = fs.createReadStream('./DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv');
 const rl = readline.createInterface({input: stream});
@@ -13,26 +15,24 @@ rl.on("line", (row) => {
     dbOperatingSites.push(row.split(';'));
 });
 
-rl.on("close", () => {
-    console.log(dbOperatingSites);
-});
-
 // server requests
+function generateCompleteSiteInfo(descriptors, values){
+    let completeDbSiteInfo = {};
+    for (let i = 0; i < descriptors[0].length; i++){
+            completeDbSiteInfo[descriptors[0][i]] = values[i];
+    };
+    return completeDbSiteInfo;
+};
+
 app.get('/', (req, res) => {
     res.send("DB Betriebstellenverzeichnis");
 });
 
 app.get('/:dbSiteCode', (req, res) => {
     let dbSiteCode = req.params.dbSiteCode;
-    let dbSite = dbOperatingSites.find(a => a[1] === dbSiteCode);
-    if (dbSite) {
-        // build json response with descriptors and values
-        let completeDbSiteInfo = {};
-        for (let i = 0; i < dbOperatingSites[0].length; i++){
-            completeDbSiteInfo[dbOperatingSites[0][i]] = dbSite[i];
-            console.log(completeDbSiteInfo)
-        };
-        res.json(completeDbSiteInfo);
+    let requestedDbSite = dbOperatingSites.find(elem => elem[1] === dbSiteCode);
+    if (requestedDbSite) {
+        res.json(generateCompleteSiteInfo(dbOperatingSites, requestedDbSite));
     }
 });
 

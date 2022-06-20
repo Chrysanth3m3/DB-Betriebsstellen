@@ -6,8 +6,6 @@ const port = 3000;
 const fs = require('fs');
 const readline = require('readline');
 
-//TODO: tests
-
 // read csv file
 const stream = fs.createReadStream('./DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv');
 const rl = readline.createInterface({input: stream});
